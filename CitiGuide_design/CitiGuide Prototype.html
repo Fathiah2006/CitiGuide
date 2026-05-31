@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CitiGuide · Prototype</title>
+<link rel="stylesheet" href="app/styles.css" />
+<style>
+  html, body { margin: 0; height: 100%; }
+  body {
+    background:
+      radial-gradient(1100px 700px at 50% -10%, #15303f, transparent 60%),
+      linear-gradient(160deg, #0c1a23, #0a141b 60%, #0d1f29);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center; min-height: 100%;
+  }
+  #stage { display: flex; align-items: center; justify-content: center; }
+  #phoneScale { transform-origin: center center; }
+  .bezel {
+    width: 410px; height: 864px; border-radius: 46px; padding: 10px;
+    background: linear-gradient(150deg, #2a2f33, #16191c);
+    box-shadow: 0 50px 120px rgba(0,0,0,.55), 0 0 0 2px rgba(255,255,255,.04) inset;
+    position: relative;
+  }
+  .bezel::after {
+    content: ''; position: absolute; top: 110px; left: -3px; width: 3px; height: 64px;
+    border-radius: 4px; background: #1b1e21;
+  }
+  .screen {
+    width: 100%; height: 100%; border-radius: 38px; overflow: hidden;
+    background: #fff; position: relative;
+  }
+  #app { width: 100%; height: 100%; }
+  .hint {
+    position: fixed; bottom: 18px; left: 0; right: 0; text-align: center;
+    color: rgba(255,255,255,.34); font-size: 12px; font-family: var(--mono); letter-spacing: .04em;
+  }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div id="phoneScale">
+      <div class="bezel"><div class="screen"><div id="app"></div></div></div>
+    </div>
+  </div>
+  <div class="hint">CitiGuide — tap through the flow · splash auto-advances</div>
+
+  <template id="__bundler_thumbnail" data-bg-color="#0B3D5C">
+    <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1200" height="800" fill="#0B3D5C"/>
+      <rect x="500" y="280" width="200" height="200" rx="60" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.3)" stroke-width="3"/>
+      <path d="M600 330a48 48 0 0 0-48 48c0 33 48 80 48 80s48-47 48-80a48 48 0 0 0-48-48zm0 66a18 18 0 1 1 0-36 18 18 0 0 1 0 36z" fill="#fff"/>
+    </svg>
+  </template>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="frames/tweaks-panel.jsx"></script>
+  <script type="text/babel" src="app/icons.jsx"></script>
+  <script type="text/babel" src="app/data.jsx"></script>
+  <script type="text/babel" src="app/ui.jsx"></script>
+  <script type="text/babel" src="app/screens-auth.jsx"></script>
+  <script type="text/babel" src="app/screens-main.jsx"></script>
+  <script type="text/babel" src="app/screens-detail.jsx"></script>
+  <script type="text/babel" src="app/screens-profile.jsx"></script>
+  <script type="text/babel" src="app/App.jsx"></script>
+
+  <script type="text/babel" data-presets="react">
+    function fitPhone() {
+      const pad = 28;
+      const sc = Math.min((window.innerHeight - pad) / 864, (window.innerWidth - pad) / 410, 1);
+      document.getElementById('phoneScale').style.transform = 'scale(' + sc + ')';
+    }
+    window.addEventListener('resize', fitPhone);
+    fitPhone();
+    const root = ReactDOM.createRoot(document.getElementById('app'));
+    root.render(React.createElement(window.CitiGuideApp, { start: 'splash', autoStart: true, initialCity: 'benin' }));
+  </script>
+</body>
+</html>
