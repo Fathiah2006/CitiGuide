@@ -189,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (_cat == 'all' && featured.isNotEmpty) ...[
             const SectionHead(title: 'Featured', sub: 'Hand-picked highlights'),
             SizedBox(
-              height: 232,
+              height: 262,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),

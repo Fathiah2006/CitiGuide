@@ -37,6 +37,10 @@ class AppTheme {
     );
   }
 
+  // Fallback fonts that carry glyphs the brand font may lack (e.g. the Naira
+  // sign ₦, U+20A6). On web, CanvasKit also auto-resolves missing glyphs.
+  static const List<String> _fallback = ['Roboto', 'Arial', 'sans-serif'];
+
   /// Display / title text styles used throughout (letter-spacing tuned).
   static TextStyle display(double size, {Color? color, double? height}) =>
       GoogleFonts.plusJakartaSans(
@@ -45,7 +49,7 @@ class AppTheme {
         letterSpacing: -size * 0.02,
         height: height,
         color: color ?? AppColors.ink,
-      );
+      ).copyWith(fontFamilyFallback: _fallback);
 
   static TextStyle title(double size, {Color? color, double? height}) =>
       GoogleFonts.plusJakartaSans(
@@ -54,7 +58,7 @@ class AppTheme {
         letterSpacing: -size * 0.01,
         height: height,
         color: color ?? AppColors.ink,
-      );
+      ).copyWith(fontFamilyFallback: _fallback);
 
   static TextStyle body(
     double size, {
@@ -67,5 +71,5 @@ class AppTheme {
         fontWeight: weight,
         height: height,
         color: color ?? AppColors.ink,
-      );
+      ).copyWith(fontFamilyFallback: _fallback);
 }

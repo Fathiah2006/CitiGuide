@@ -16,6 +16,8 @@ class SupabaseService {
   SupabaseService._();
   static final SupabaseService instance = SupabaseService._();
 
+  static bool _ready = false;
+
   SupabaseClient get _db => Supabase.instance.client;
 
   /// Initialise the SDK. Returns false (and no-ops) when not configured.
@@ -27,10 +29,14 @@ class SupabaseService {
       url: SupabaseConfig.url,
       anonKey: SupabaseConfig.anonKey, // ignore: deprecated_member_use
     );
+    _ready = true;
     return true;
   }
 
-  bool get enabled => SupabaseConfig.isConfigured;
+  /// True only when configured AND successfully initialised — so code paths
+  /// that never called [initialize] (e.g. widget tests) fall back to seed data
+  /// instead of touching an uninitialised client.
+  bool get enabled => SupabaseConfig.isConfigured && _ready;
 
   // ── auth ──────────────────────────────────────────────────────────────────
   Session? get session => _db.auth.currentSession;

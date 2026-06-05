@@ -19,6 +19,8 @@ class Listing {
   final double? hue; // overrides category hue when set
   final List<String> tags;
   final String? coverImageUrl;
+  final double? latitude;
+  final double? longitude;
 
   const Listing({
     required this.id,
@@ -40,6 +42,8 @@ class Listing {
     required this.hue,
     required this.tags,
     this.coverImageUrl,
+    this.latitude,
+    this.longitude,
   });
 
   factory Listing.fromMap(Map<String, dynamic> m) => Listing(
@@ -62,5 +66,7 @@ class Listing {
         hue: (m['hue'] as num?)?.toDouble(),
         tags: ((m['tags'] as List?)?.cast<String>()) ?? const [],
         coverImageUrl: m['cover_image_url'] as String?,
+        latitude: (m['latitude'] as num?)?.toDouble(),
+        longitude: (m['longitude'] as num?)?.toDouble(),
       );
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../app/theme.dart';
 import '../../models/city.dart';
@@ -8,26 +10,61 @@ import '../../services/seed_data.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/cg_image.dart';
-import '../../widgets/mini_map.dart';
+import '../../widgets/map_marker.dart';
 
-/// Map / directions screen — abstract map backdrop and a directions card that
+/// Full interactive map (OpenStreetMap, no API key) with a directions card that
 /// hands off to Google or Apple Maps for real turn-by-turn navigation.
-class MapScreen extends StatelessWidget {
+class MapScreen extends StatefulWidget {
   final String listingId;
   const MapScreen({super.key, required this.listingId});
 
   @override
-  Widget build(BuildContext context) {
-    final l = SeedData.listingById(listingId)!;
-    final cat = SeedData.catById(l.categoryId)!;
-    final city = SeedData.cityById(l.cityId)!;
+  State<MapScreen> createState() => _MapScreenState();
+}
 
+class _MapScreenState extends State<MapScreen> {
+  final _controller = MapController();
+  late final Listing _listing;
+  late final City _city;
+  late final LatLng _center;
+
+  @override
+  void initState() {
+    super.initState();
+    _listing = SeedData.listingById(widget.listingId)!;
+    _city = SeedData.cityById(_listing.cityId)!;
+    _center = LatLng(
+      _listing.latitude ?? _city.lat,
+      _listing.longitude ?? _city.lng,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cat = SeedData.catById(_listing.categoryId)!;
     return Scaffold(
       backgroundColor: const Color(0xFFEAF0F2),
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: MiniMap(height: double.infinity, radius: 0),
+          Positioned.fill(
+            child: FlutterMap(
+              mapController: _controller,
+              options: MapOptions(initialCenter: _center, initialZoom: 14),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.citiguide.app',
+                ),
+                MarkerLayer(markers: [
+                  Marker(
+                      point: _center,
+                      width: 44,
+                      height: 44,
+                      child: const MapMarkerPin(size: 44)),
+                ]),
+              ],
+            ),
           ),
           SafeArea(
             bottom: false,
@@ -44,7 +81,7 @@ class MapScreen extends StatelessWidget {
                   _WhiteCircle(
                     icon: Icons.my_location,
                     color: AppColors.primary,
-                    onTap: () {},
+                    onTap: () => _controller.move(_center, 15),
                   ),
                 ],
               ),
@@ -54,7 +91,7 @@ class MapScreen extends StatelessWidget {
             left: 14,
             right: 14,
             bottom: 30,
-            child: _DirectionsCard(listing: l, cat: cat.name, city: city),
+            child: _DirectionsCard(listing: _listing, cat: cat.name, city: _city),
           ),
         ],
       ),
@@ -72,6 +109,8 @@ class _DirectionsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hue = listing.hue ?? SeedData.catById(listing.categoryId)!.hue;
+    final lat = listing.latitude ?? city.lat;
+    final lng = listing.longitude ?? city.lng;
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -154,8 +193,7 @@ class _DirectionsCard extends StatelessWidget {
                 child: CgButton(
                   label: 'Google Maps',
                   icon: Icons.navigation_outlined,
-                  onPressed: () => MapLauncherService.openGoogleMaps(
-                      city.lat, city.lng,
+                  onPressed: () => MapLauncherService.openGoogleMaps(lat, lng,
                       label: listing.name),
                 ),
               ),
@@ -164,8 +202,7 @@ class _DirectionsCard extends StatelessWidget {
                 child: CgButton(
                   label: 'Apple Maps',
                   variant: CgButtonVariant.outline,
-                  onPressed: () => MapLauncherService.openAppleMaps(
-                      city.lat, city.lng,
+                  onPressed: () => MapLauncherService.openAppleMaps(lat, lng,
                       label: listing.name),
                 ),
               ),

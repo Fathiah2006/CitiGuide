@@ -38,6 +38,9 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
     final app = context.watch<AppState>();
     final l = SeedData.listingById(widget.listingId)!;
     final cat = SeedData.catById(l.categoryId)!;
+    final city = SeedData.cityById(l.cityId);
+    final lat = l.latitude ?? city?.lat ?? 9.07;
+    final lng = l.longitude ?? city?.lng ?? 7.49;
     final baseHue = l.hue ?? cat.hue;
     final reviews = app.reviewsFor(l.id);
     final isFav = app.isFavourite(l.id);
@@ -186,7 +189,11 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
                       const SizedBox(height: 20),
                       Text('Location', style: AppTheme.title(17)),
                       const SizedBox(height: 12),
-                      MiniMap(onTap: openMap, label: 'Directions'),
+                      MiniMap(
+                          lat: lat,
+                          lng: lng,
+                          onTap: openMap,
+                          label: 'Directions'),
                       const SizedBox(height: 10),
                       Row(
                         children: [
