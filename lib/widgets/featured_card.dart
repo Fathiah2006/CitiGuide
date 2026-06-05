@@ -4,7 +4,7 @@ import '../app/theme.dart';
 import '../models/listing.dart';
 import '../services/seed_data.dart';
 import '../utils/app_colors.dart';
-import 'cg_photo.dart';
+import 'cg_image.dart';
 import 'heart_button.dart';
 import 'star_rating.dart';
 
@@ -46,7 +46,8 @@ class FeaturedCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(20)),
-                    child: CgPhoto(
+                    child: CgImage(
+                        imageUrl: listing.coverImageUrl,
                         hue: listing.hue ?? cat.hue,
                         cat: cat.icon,
                         dim: true),

@@ -7,6 +7,7 @@ import '../screens/auth/splash_screen.dart';
 import '../screens/city/city_select_screen.dart';
 import '../screens/details/listing_details_screen.dart';
 import '../screens/details/map_screen.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/main_shell.dart';
 import '../screens/profile/edit_profile_screen.dart';
 import '../screens/reviews/add_review_screen.dart';
@@ -53,6 +54,9 @@ class AppRouter {
         break;
       case Routes.editProfile:
         page = const EditProfileScreen();
+        break;
+      case Routes.admin:
+        page = const AdminDashboardScreen();
         break;
       default:
         page = const SplashScreen();

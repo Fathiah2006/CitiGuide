@@ -6,7 +6,7 @@ import '../../services/seed_data.dart';
 import '../../state/app_state.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/buttons.dart';
-import '../../widgets/cg_photo.dart';
+import '../../widgets/cg_image.dart';
 
 /// Write-a-review form: tap-to-rate stars + comment field.
 class AddReviewScreen extends StatefulWidget {
@@ -29,15 +29,28 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (_rating == 0) return;
-    context
-        .read<AppState>()
-        .addReview(widget.listingId, _rating, _text.text);
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Review posted · thank you!')));
+  bool _busy = false;
+
+  Future<void> _submit() async {
+    if (_rating == 0 || _busy) return;
+    setState(() => _busy = true);
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await context
+          .read<AppState>()
+          .addReview(widget.listingId, _rating, _text.text);
+      navigator.pop();
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+            const SnackBar(content: Text('Review posted · thank you!')));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      messenger.showSnackBar(
+          const SnackBar(content: Text('Could not post review. Try again.')));
+    }
   }
 
   @override
@@ -68,7 +81,8 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                     SizedBox(
                         width: 56,
                         height: 56,
-                        child: CgPhoto(
+                        child: CgImage(
+                            imageUrl: l.coverImageUrl,
                             hue: l.hue ?? cat.hue,
                             cat: cat.icon,
                             radius: 14)),
@@ -189,8 +203,8 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
                 border: Border(top: BorderSide(color: AppColors.line)),
               ),
               child: CgButton(
-                  label: 'Post review',
-                  enabled: _rating > 0,
+                  label: _busy ? 'Posting…' : 'Post review',
+                  enabled: _rating > 0 && !_busy,
                   onPressed: _submit),
             ),
           ),

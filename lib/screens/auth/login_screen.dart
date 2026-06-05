@@ -27,9 +27,30 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
-    context.read<AppState>().login(_email.text.trim());
-    Navigator.of(context).pushNamedAndRemoveUntil(Routes.city, (_) => false);
+  bool _busy = false;
+
+  Future<void> _login() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await context
+          .read<AppState>()
+          .login(_email.text.trim(), _password.text);
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(Routes.city, (_) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(_friendly(e))));
+    }
+  }
+
+  String _friendly(Object e) {
+    final m = e.toString();
+    if (m.contains('Invalid login')) return 'Wrong email or password.';
+    return 'Could not log in. Check your details and connection.';
   }
 
   @override
@@ -67,7 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 22),
-              CgButton(label: 'Log in', onPressed: _login),
+              CgButton(
+                  label: _busy ? 'Logging in…' : 'Log in',
+                  enabled: !_busy,
+                  onPressed: _login),
               const SizedBox(height: 22),
               Row(children: [
                 const Expanded(child: Divider(color: AppColors.line)),

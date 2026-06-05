@@ -1,117 +1,81 @@
-# CitiGuide — Supabase schema reference
+# CitiGuide × Supabase — setup & operations
 
-This is the backend the app is designed to plug into (per the project spec). The
-app currently runs on the in-memory `SeedData` mirror; use this when promoting to
-a real Supabase project.
+The app talks to Supabase through `lib/services/supabase_service.dart`. When no
+credentials are configured it transparently falls back to the bundled seed data,
+so the app always runs.
 
-## Tables
+## 1. Connect the app to your project
 
-```sql
--- profiles (extends auth.users)
-create table profiles (
-  id uuid primary key references auth.users(id),
-  full_name text,
-  avatar_url text,
-  phone text,
-  notification_enabled boolean default true,
-  role text default 'user',                 -- 'user' | 'admin'
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
+Get your **Project URL** and **anon / public** key from
+Supabase → Project Settings → **API**, then either:
 
-create table cities (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  slug text unique not null,
-  description text,
-  image_url text,
-  country text,
-  is_active boolean default true,
-  created_at timestamptz default now()
-);
+**Option A — edit the config file** (`lib/config/supabase_config.dart`):
 
-create table categories (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  slug text unique not null,
-  icon text,
-  created_at timestamptz default now()
-);
-
-create table listings (
-  id uuid primary key default gen_random_uuid(),
-  city_id uuid references cities(id),
-  category_id uuid references categories(id),
-  name text not null,
-  slug text not null,
-  short_description text,
-  description text,
-  cover_image_url text,
-  website_url text,
-  phone text,
-  email text,
-  address text,
-  latitude double precision,
-  longitude double precision,
-  opening_hours text,
-  rating_average numeric default 0,
-  rating_count integer default 0,
-  is_featured boolean default false,
-  is_active boolean default true,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-create table listing_images (
-  id uuid primary key default gen_random_uuid(),
-  listing_id uuid references listings(id) on delete cascade,
-  image_url text not null,
-  sort_order integer default 0,
-  created_at timestamptz default now()
-);
-
-create table reviews (
-  id uuid primary key default gen_random_uuid(),
-  listing_id uuid references listings(id) on delete cascade,
-  user_id uuid references auth.users(id),
-  rating integer not null check (rating between 1 and 5),
-  comment text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now(),
-  unique (listing_id, user_id)
-);
-
-create table review_likes (
-  id uuid primary key default gen_random_uuid(),
-  review_id uuid references reviews(id) on delete cascade,
-  user_id uuid references auth.users(id),
-  created_at timestamptz default now(),
-  unique (review_id, user_id)
-);
-
-create table favourites (
-  id uuid primary key default gen_random_uuid(),
-  listing_id uuid references listings(id) on delete cascade,
-  user_id uuid references auth.users(id),
-  created_at timestamptz default now(),
-  unique (listing_id, user_id)
-);
+```dart
+static const String url     = 'https://YOUR-REF.supabase.co';
+static const String anonKey = 'eyJ...your anon public key...';
 ```
 
-## Row Level Security (summary)
+**Option B — pass at run/build time** (keeps keys out of source):
 
-- Public: read active `cities`, `categories`, `listings`, `listing_images`.
-- Authenticated: read/update **own** `profile`; CRUD **own** `reviews`,
-  `review_likes`, `favourites`.
-- Admin (`profiles.role = 'admin'`): manage all content.
+```bash
+flutter run \
+  --dart-define=SUPABASE_URL=https://YOUR-REF.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=eyJ...
+```
 
-## Setup checklist
+The anon key is safe in a client app — Row-Level Security guards the data.
 
-1. Create the Supabase project; enable **Email/Password** auth.
-2. Create the tables above; enable RLS on all of them and add the policies.
-3. Create storage bucket `city-guide-images`.
-4. Seed: 4 categories, the cities and listings (mirror `lib/services/seed_data.dart`).
-5. Wire `supabase_flutter` in `main.dart` and a `SupabaseService` that mirrors
-   the `SeedData` read API; swap `AppState`'s data source over.
+## 2. Create the schema + seed data
 
-Admin content management for the MVP is handled through **Supabase Studio**.
+Open the Supabase **SQL Editor**, paste the entire contents of
+[`supabase/migrations/0001_init.sql`](../supabase/migrations/0001_init.sql) and
+**Run**. This creates all tables, RLS policies, triggers, the
+`city-guide-images` storage bucket, and seeds 4 categories, 4 cities, 23
+listings and a few demo reviews. It is safe to re-run.
+
+## 3. Disable email confirmation (for smooth sign-up)
+
+Authentication → **Sign In / Providers → Email** → turn **off** "Confirm email".
+New sign-ups then receive a session immediately.
+
+## 4. Become an admin
+
+Sign up once in the app, then run this in the SQL Editor (the in-app **Admin
+dashboard** appears on your Profile after you re-open the app):
+
+```sql
+update public.profiles set role = 'admin'
+where id = (select id from auth.users where email = 'YOUR_EMAIL_HERE');
+```
+
+## What the app uses
+
+| Feature | Supabase mechanism |
+|---------|--------------------|
+| Sign up / in / out | `auth` (email + password) |
+| Profile auto-created on signup | `handle_new_user` trigger → `profiles` |
+| Cities / categories / listings | public `select` (RLS), hydrated at launch |
+| Favourites | `favourites` table (per-user, RLS) |
+| Reviews | `reviews` + `add_review()` RPC (blends rating) |
+| Admin CRUD | `listings` / `cities` writes gated by `is_admin()` |
+| Review moderation | admin `delete` on `reviews` |
+| Images | `city-guide-images` Storage bucket (admin upload, public read) |
+
+## Schema notes / deviations from the original spec
+
+- `reviews.author_name` (denormalised) + nullable `user_id` — lets us seed demo
+  reviews and display an author without granting read access to other users'
+  profiles (which RLS forbids).
+- `cities` gained `state`, `tagline`, `hue`, `sort_order`; `listings` gained
+  `price`, `open_now`, `tags`, `hue` to match the app's design fields.
+- `rating_average` / `rating_count` are curated baselines; `add_review()` blends
+  new ratings in rather than resetting the count to the number of stored rows.
+
+## Images
+
+Listings and cities seed reliable, topical photo URLs (LoremFlickr) so the app
+looks populated immediately. Admins can upload real photos via the listing/city
+forms — they land in the `city-guide-images` bucket and replace the cover URL.
+Any image that fails to load falls back to the deterministic placeholder, so the
+UI never looks broken.

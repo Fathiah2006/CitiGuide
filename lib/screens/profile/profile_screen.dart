@@ -152,10 +152,50 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 14),
+                if (app.isAdmin) ...[
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pushNamed(Routes.admin),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 15),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: AppShadows.sh1,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(11),
+                            ),
+                            child: const Icon(Icons.shield_outlined,
+                                size: 19, color: Colors.white),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text('Admin dashboard',
+                                style: AppTheme.body(15.5,
+                                    weight: FontWeight.w700,
+                                    color: Colors.white)),
+                          ),
+                          Icon(Icons.chevron_right,
+                              size: 19,
+                              color: Colors.white.withValues(alpha: 0.7)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                ],
                 GestureDetector(
-                  onTap: () {
-                    app.logout();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
+                  onTap: () async {
+                    final navigator = Navigator.of(context);
+                    await app.logout();
+                    navigator.pushNamedAndRemoveUntil(
                         Routes.login, (_) => false);
                   },
                   child: Container(

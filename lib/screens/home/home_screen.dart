@@ -8,7 +8,7 @@ import '../../services/seed_data.dart';
 import '../../state/app_state.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/cg_chip.dart';
-import '../../widgets/cg_photo.dart';
+import '../../widgets/cg_image.dart';
 import '../../widgets/featured_card.dart';
 import '../../widgets/listing_row.dart';
 import '../../widgets/section_head.dart';
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                CgPhoto(hue: city.hue, dim: true),
+                CgImage(imageUrl: city.imageUrl, hue: city.hue, dim: true),
                 SafeArea(
                   bottom: false,
                   child: Padding(

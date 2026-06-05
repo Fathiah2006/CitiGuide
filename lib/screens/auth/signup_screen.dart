@@ -30,10 +30,28 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _create() {
-    if (!_agree) return;
-    context.read<AppState>().signup(_name.text.trim(), _email.text.trim());
-    Navigator.of(context).pushNamedAndRemoveUntil(Routes.city, (_) => false);
+  bool _busy = false;
+
+  Future<void> _create() async {
+    if (!_agree || _busy) return;
+    setState(() => _busy = true);
+    try {
+      await context
+          .read<AppState>()
+          .signup(_name.text.trim(), _email.text.trim(), _password.text);
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(Routes.city, (_) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      final m = e.toString();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+            content: Text(m.contains('already')
+                ? 'That email is already registered.'
+                : 'Could not create account. Try again.')));
+    }
   }
 
   @override
@@ -118,7 +136,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 22),
-              CgButton(label: 'Create account', onPressed: _create, enabled: _agree),
+              CgButton(
+                  label: _busy ? 'Creating…' : 'Create account',
+                  onPressed: _create,
+                  enabled: _agree && !_busy),
               const SizedBox(height: 24),
               Center(
                 child: Text.rich(

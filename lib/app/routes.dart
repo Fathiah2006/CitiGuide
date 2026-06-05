@@ -12,4 +12,5 @@ class Routes {
   static const reviews = '/reviews'; // arg: String listingId
   static const addReview = '/add-review'; // arg: String listingId
   static const editProfile = '/edit-profile';
+  static const admin = '/admin';
 }

@@ -25,7 +25,18 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 2200), _advance);
+    _start();
+  }
+
+  Future<void> _start() async {
+    // Load catalogue + session while the splash animation plays, honouring a
+    // minimum on-screen duration so the splash never just flashes.
+    final app = context.read<AppState>();
+    await Future.wait([
+      app.bootstrap(),
+      Future<void>.delayed(const Duration(milliseconds: 2200)),
+    ]);
+    _advance();
   }
 
   void _advance() {

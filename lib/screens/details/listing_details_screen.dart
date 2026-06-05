@@ -8,7 +8,7 @@ import '../../services/map_launcher_service.dart';
 import '../../services/seed_data.dart';
 import '../../state/app_state.dart';
 import '../../utils/app_colors.dart';
-import '../../widgets/cg_photo.dart';
+import '../../widgets/cg_image.dart';
 import '../../widgets/heart_button.dart';
 import '../../widgets/mini_map.dart';
 import '../../widgets/rating_summary.dart';
@@ -25,6 +25,13 @@ class ListingDetailsScreen extends StatefulWidget {
 
 class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
   int _img = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => context.read<AppState>().ensureReviews(widget.listingId));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +57,11 @@ class _ListingDetailsScreenState extends State<ListingDetailsScreen> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    CgPhoto(hue: baseHue + _img * 14, cat: cat.icon, dim: true),
+                    CgImage(
+                        imageUrl: l.coverImageUrl,
+                        hue: baseHue + _img * 14,
+                        cat: cat.icon,
+                        dim: true),
                     SafeArea(
                       bottom: false,
                       child: Padding(

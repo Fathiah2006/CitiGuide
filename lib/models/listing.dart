@@ -18,6 +18,7 @@ class Listing {
   final int images;
   final double? hue; // overrides category hue when set
   final List<String> tags;
+  final String? coverImageUrl;
 
   const Listing({
     required this.id,
@@ -38,5 +39,28 @@ class Listing {
     required this.images,
     required this.hue,
     required this.tags,
+    this.coverImageUrl,
   });
+
+  factory Listing.fromMap(Map<String, dynamic> m) => Listing(
+        id: m['id'] as String,
+        cityId: m['city_id'] as String,
+        categoryId: m['category_id'] as String,
+        name: m['name'] as String,
+        rating: (m['rating_average'] as num?)?.toDouble() ?? 0,
+        ratingCount: (m['rating_count'] as num?)?.toInt() ?? 0,
+        short: (m['short_description'] ?? '') as String,
+        description: (m['description'] ?? '') as String,
+        address: (m['address'] ?? '') as String,
+        phone: (m['phone'] ?? '') as String,
+        website: (m['website_url'] ?? '') as String,
+        hours: (m['opening_hours'] ?? '') as String,
+        openNow: (m['open_now'] ?? true) as bool,
+        price: (m['price'] ?? '') as String,
+        featured: (m['is_featured'] ?? false) as bool,
+        images: 3,
+        hue: (m['hue'] as num?)?.toDouble(),
+        tags: ((m['tags'] as List?)?.cast<String>()) ?? const [],
+        coverImageUrl: m['cover_image_url'] as String?,
+      );
 }

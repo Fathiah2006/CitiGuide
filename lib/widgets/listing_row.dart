@@ -4,7 +4,7 @@ import '../app/theme.dart';
 import '../models/listing.dart';
 import '../services/seed_data.dart';
 import '../utils/app_colors.dart';
-import 'cg_photo.dart';
+import 'cg_image.dart';
 import 'heart_button.dart';
 import 'star_rating.dart';
 
@@ -35,8 +35,11 @@ class ListingRow extends StatelessWidget {
             SizedBox(
               width: 92,
               height: 92,
-              child: CgPhoto(
-                  hue: listing.hue ?? cat.hue, cat: cat.icon, radius: 16),
+              child: CgImage(
+                  imageUrl: listing.coverImageUrl,
+                  hue: listing.hue ?? cat.hue,
+                  cat: cat.icon,
+                  radius: 16),
             ),
             const SizedBox(width: 13),
             Expanded(

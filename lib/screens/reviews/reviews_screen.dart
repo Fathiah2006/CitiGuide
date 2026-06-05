@@ -11,14 +11,26 @@ import '../../widgets/rating_summary.dart';
 import '../../widgets/review_item.dart';
 
 /// All reviews for a listing, with a sticky "Write a review" CTA.
-class ReviewsScreen extends StatelessWidget {
+class ReviewsScreen extends StatefulWidget {
   final String listingId;
   const ReviewsScreen({super.key, required this.listingId});
 
   @override
+  State<ReviewsScreen> createState() => _ReviewsScreenState();
+}
+
+class _ReviewsScreenState extends State<ReviewsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => context.read<AppState>().ensureReviews(widget.listingId));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    final l = SeedData.listingById(listingId)!;
+    final l = SeedData.listingById(widget.listingId)!;
     final reviews = app.reviewsFor(l.id);
 
     void add() =>

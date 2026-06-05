@@ -7,7 +7,7 @@ import '../../services/map_launcher_service.dart';
 import '../../services/seed_data.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/buttons.dart';
-import '../../widgets/cg_photo.dart';
+import '../../widgets/cg_image.dart';
 import '../../widgets/mini_map.dart';
 
 /// Map / directions screen — abstract map backdrop and a directions card that
@@ -87,7 +87,8 @@ class _DirectionsCard extends StatelessWidget {
               SizedBox(
                 width: 58,
                 height: 58,
-                child: CgPhoto(
+                child: CgImage(
+                    imageUrl: listing.coverImageUrl,
                     hue: hue,
                     cat: SeedData.catById(listing.categoryId)!.icon,
                     radius: 14),

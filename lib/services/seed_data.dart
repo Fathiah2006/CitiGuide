@@ -11,14 +11,20 @@ import '../models/review.dart';
 class SeedData {
   SeedData._();
 
-  static const List<Category> categories = [
+  // Mutable catalogue — defaults to the bundled seed, but can be replaced at
+  // runtime by data fetched from Supabase via [hydrate]. Screens read these
+  // synchronously, so the live backend simply swaps the contents in place.
+  static List<Category> categories = _seedCategories;
+  static List<City> cities = _seedCities;
+
+  static const List<Category> _seedCategories = [
     Category(id: 'attractions', name: 'Attractions', icon: 'landmark', hue: 188),
     Category(id: 'restaurants', name: 'Restaurants', icon: 'utensils', hue: 28),
     Category(id: 'hotels', name: 'Hotels', icon: 'bed', hue: 214),
     Category(id: 'events', name: 'Events', icon: 'ticket', hue: 280),
   ];
 
-  static const List<City> cities = [
+  static const List<City> _seedCities = [
     City(
       id: 'benin',
       name: 'Benin City',
@@ -30,6 +36,7 @@ class SeedData {
       lat: 6.34,
       lng: 5.62,
       places: 7,
+      imageUrl: 'https://loremflickr.com/800/600/benin,city?lock=11',
     ),
     City(
       id: 'ph',
@@ -42,6 +49,7 @@ class SeedData {
       lat: 4.81,
       lng: 7.04,
       places: 6,
+      imageUrl: 'https://loremflickr.com/800/600/river,city?lock=12',
     ),
     City(
       id: 'lagos',
@@ -54,6 +62,7 @@ class SeedData {
       lat: 6.45,
       lng: 3.39,
       places: 6,
+      imageUrl: 'https://loremflickr.com/800/600/lagos,city?lock=13',
     ),
     City(
       id: 'abuja',
@@ -66,6 +75,7 @@ class SeedData {
       lat: 9.07,
       lng: 7.49,
       places: 5,
+      imageUrl: 'https://loremflickr.com/800/600/abuja,city?lock=14',
     ),
   ];
 
@@ -97,6 +107,14 @@ class SeedData {
     final genPhone =
         '+234 80${(1000000 + _seq * 13337).toString().substring(0, 7)}';
     final genSite = '${name.toLowerCase().replaceAll(RegExp(r'[^a-z]+'), '')}.ng';
+    const kw = {
+      'attractions': 'landmark,monument',
+      'restaurants': 'restaurant,food',
+      'hotels': 'hotel,room',
+      'events': 'festival,concert',
+    };
+    final coverImageUrl =
+        'https://loremflickr.com/800/600/${kw[cat] ?? 'city'}?lock=${100 + _seq}';
     return Listing(
       id: 'l$_seq',
       cityId: city,
@@ -117,10 +135,24 @@ class SeedData {
       images: images,
       hue: hue,
       tags: tags,
+      coverImageUrl: coverImageUrl,
     );
   }
 
-  static final List<Listing> listings = _buildListings();
+  static List<Listing> listings = _buildListings();
+
+  /// Replace the in-memory catalogue with data loaded from the backend.
+  static void hydrate({
+    List<Category>? categories,
+    List<City>? cities,
+    List<Listing>? listings,
+  }) {
+    if (categories != null && categories.isNotEmpty) {
+      SeedData.categories = categories;
+    }
+    if (cities != null && cities.isNotEmpty) SeedData.cities = cities;
+    if (listings != null) SeedData.listings = listings;
+  }
 
   static List<Listing> _buildListings() {
     _seq = 0;

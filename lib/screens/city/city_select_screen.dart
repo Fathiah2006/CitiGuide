@@ -7,7 +7,7 @@ import '../../models/city.dart';
 import '../../services/seed_data.dart';
 import '../../state/app_state.dart';
 import '../../utils/app_colors.dart';
-import '../../widgets/cg_photo.dart';
+import '../../widgets/cg_image.dart';
 
 /// City selection — first run after login, and "Change city" from home.
 class CitySelectScreen extends StatelessWidget {
@@ -92,7 +92,8 @@ class _CityCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            CgPhoto(hue: city.hue, dim: true, radius: 22),
+            CgImage(
+                imageUrl: city.imageUrl, hue: city.hue, dim: true, radius: 22),
             Padding(
               padding: const EdgeInsets.all(18),
               child: Column(

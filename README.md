@@ -89,22 +89,34 @@ pushed on top.
 
 ---
 
-## 🔌 Backend (Supabase) — current status & swap path
+## 🔌 Backend — Supabase (with offline fallback)
 
-The spec calls for **Supabase** as the backend. To keep the app fully functional
-offline (and free of credentials), data is currently served from
-`services/seed_data.dart`, whose public API (`byCity`, `listingById`,
-`reviewsFor`, …) deliberately mirrors what a `SupabaseService` would expose, and
-all mutations go through `AppState`.
+The app is wired to **Supabase** for auth, data, favourites, reviews, admin CRUD
+and image storage, all behind `services/supabase_service.dart`. When no
+credentials are present it **falls back to the bundled seed data**, so it always
+runs (great for tests/CI and quick demos).
 
-To move to Supabase later:
+- **Connect it:** follow [`docs/SUPABASE.md`](docs/SUPABASE.md) — paste your URL +
+  anon key, run `supabase/migrations/0001_init.sql`, disable email confirmation.
+- **Catalogue** (cities/categories/listings) is fetched at launch and hydrated
+  into `SeedData`, so screens stay synchronous and unchanged.
+- **Favourites & reviews** are per-user with Row-Level Security; reviews post via
+  an `add_review()` RPC that blends the new rating into the listing average.
 
-1. Add `supabase_flutter` and initialise it in `main.dart`.
-2. Create a `SupabaseService` implementing the same read methods as `SeedData`.
-3. Point `AppState` at it (auth, favourites, reviews become network calls).
-4. Apply the schema and policies in [`docs/SUPABASE.md`](docs/SUPABASE.md).
+## 🛠 Admin (role-gated, in-app)
 
-No screen or widget needs to change — they depend on models and `AppState`, not
-on the data source.
+Users with `profiles.role = 'admin'` see an **Admin dashboard** entry on their
+Profile that can:
+- Add / edit / delete **listings** (with image upload to Storage).
+- Add / edit / delete **cities**.
+- **Moderate** and remove reviews.
+
+Promote yourself with the one-line SQL in `docs/SUPABASE.md`.
+
+## 🖼 Images
+
+Listings & cities carry real photo URLs and render via `CgImage`
+(`cached_network_image`) with the duotone placeholder as a graceful fallback.
+Admins can upload real photos that replace the cover image.
 
 See **[`docs/USER_GUIDE.md`](docs/USER_GUIDE.md)** for the end-user walkthrough.
