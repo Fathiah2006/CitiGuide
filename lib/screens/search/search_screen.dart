@@ -68,7 +68,8 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    final city = SeedData.cityById(app.selectedCityId ?? 'benin')!;
+    final city =
+        SeedData.cityById(app.selectedCityId ?? '') ?? SeedData.cities.first;
     final hasQuery = _query.trim().isNotEmpty;
     final results = _results(city.id);
 

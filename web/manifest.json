@@ -1,11 +1,11 @@
 {
-    "name": "citi_guide",
-    "short_name": "citi_guide",
+    "name": "CitiGuide",
+    "short_name": "CitiGuide",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0B3D5C",
+    "theme_color": "#0B3D5C",
+    "description": "Discover your city, like a local.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

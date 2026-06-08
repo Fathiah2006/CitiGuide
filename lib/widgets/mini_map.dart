@@ -45,14 +45,16 @@ class MiniMap extends StatelessWidget {
                   options: MapOptions(
                     initialCenter: center,
                     initialZoom: 13,
-                    interactionOptions:
-                        const InteractionOptions(flags: InteractiveFlag.none),
+                    backgroundColor: const Color(0xFFE8EEF1),
+                    interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.none),
                   ),
                   children: [
                     TileLayer(
                       urlTemplate:
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.citiguide.app',
+                      tileProvider: NetworkTileProvider(),
                     ),
                     MarkerLayer(markers: [
                       Marker(

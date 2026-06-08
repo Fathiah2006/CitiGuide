@@ -29,7 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppState>();
-    final city = SeedData.cityById(app.selectedCityId ?? 'benin')!;
+    final city =
+        SeedData.cityById(app.selectedCityId ?? '') ?? SeedData.cities.first;
     final all = SeedData.byCity(city.id);
     final featured = all.where((l) => l.featured).toList();
     final list = _cat == 'all'

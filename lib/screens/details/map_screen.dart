@@ -49,12 +49,17 @@ class _MapScreenState extends State<MapScreen> {
           Positioned.fill(
             child: FlutterMap(
               mapController: _controller,
-              options: MapOptions(initialCenter: _center, initialZoom: 14),
+              options: MapOptions(
+                initialCenter: _center,
+                initialZoom: 14,
+                backgroundColor: const Color(0xFFE8EEF1),
+              ),
               children: [
                 TileLayer(
                   urlTemplate:
                       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.citiguide.app',
+                  tileProvider: NetworkTileProvider(),
                 ),
                 MarkerLayer(markers: [
                   Marker(
@@ -62,6 +67,9 @@ class _MapScreenState extends State<MapScreen> {
                       width: 44,
                       height: 44,
                       child: const MapMarkerPin(size: 44)),
+                ]),
+                const RichAttributionWidget(attributions: [
+                  TextSourceAttribution('OpenStreetMap contributors'),
                 ]),
               ],
             ),

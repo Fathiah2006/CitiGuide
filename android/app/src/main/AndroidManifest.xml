@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required for Supabase, map tiles and network images in release builds. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="citi_guide"
+        android:label="CitiGuide"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
