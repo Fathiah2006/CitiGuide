@@ -105,6 +105,25 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── password reset (OTP code flow) ──
+  Future<void> sendResetCode(String email) async {
+    if (_online) await _supa.sendPasswordResetCode(email);
+  }
+
+  Future<void> verifyResetCode(String email, String code) async {
+    if (_online) await _supa.verifyRecoveryCode(email, code);
+  }
+
+  /// Sets the new password, then signs out so the user logs in fresh.
+  Future<void> updatePassword(String newPassword) async {
+    if (_online) {
+      await _supa.updatePassword(newPassword);
+      await _supa.signOut();
+    }
+    _isLoggedIn = false;
+    notifyListeners();
+  }
+
   Future<void> logout() async {
     if (_online) {
       await _supa.signOut();

@@ -58,6 +58,19 @@ class SupabaseService {
 
   Future<void> signOut() => _db.auth.signOut();
 
+  // ── password reset (OTP code flow) ──
+  /// Sends a recovery email. With the dashboard template including
+  /// `{{ .Token }}`, the user receives a 6-digit code.
+  Future<void> sendPasswordResetCode(String email) =>
+      _db.auth.resetPasswordForEmail(email);
+
+  /// Verifies the 6-digit recovery code; on success the user is signed in.
+  Future<void> verifyRecoveryCode(String email, String code) =>
+      _db.auth.verifyOTP(type: OtpType.recovery, email: email, token: code);
+
+  Future<void> updatePassword(String newPassword) =>
+      _db.auth.updateUser(UserAttributes(password: newPassword));
+
   // ── profile ─────────────────────────────────────────────────────────────
   Future<(Profile, String role)?> fetchProfile() async {
     final id = userId;

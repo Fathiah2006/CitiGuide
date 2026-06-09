@@ -89,11 +89,13 @@ class AppPasswordField extends StatefulWidget {
   final String label;
   final String hint;
   final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
   const AppPasswordField({
     super.key,
     this.label = 'Password',
     this.hint = '••••••••',
     this.controller,
+    this.onChanged,
   });
 
   @override
@@ -111,6 +113,7 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
       hint: widget.hint,
       controller: widget.controller,
       obscureText: !_show,
+      onChanged: widget.onChanged,
       trailing: GestureDetector(
         onTap: () => setState(() => _show = !_show),
         child: Icon(
