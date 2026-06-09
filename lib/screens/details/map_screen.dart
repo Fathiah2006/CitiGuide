@@ -56,18 +56,20 @@ class _MapScreenState extends State<MapScreen> {
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.citiguide.app',
                   tileProvider: NetworkTileProvider(),
                 ),
-                MarkerLayer(markers: [
-                  Marker(
+                MarkerLayer(
+                  markers: [
+                    Marker(
                       point: _center,
                       width: 44,
                       height: 44,
-                      child: const MapMarkerPin(size: 44)),
-                ]),
+                      child: const MapMarkerPin(size: 44),
+                    ),
+                  ],
+                ),
                 const RichAttributionWidget(attributions: [
                   TextSourceAttribution('OpenStreetMap contributors'),
                 ]),
@@ -99,7 +101,11 @@ class _MapScreenState extends State<MapScreen> {
             left: 14,
             right: 14,
             bottom: 30,
-            child: _DirectionsCard(listing: _listing, cat: cat.name, city: _city),
+            child: _DirectionsCard(
+              listing: _listing,
+              cat: cat.name,
+              city: _city,
+            ),
           ),
         ],
       ),
@@ -111,8 +117,11 @@ class _DirectionsCard extends StatelessWidget {
   final Listing listing;
   final String cat;
   final City city;
-  const _DirectionsCard(
-      {required this.listing, required this.cat, required this.city});
+  const _DirectionsCard({
+    required this.listing,
+    required this.cat,
+    required this.city,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -135,32 +144,39 @@ class _DirectionsCard extends StatelessWidget {
                 width: 58,
                 height: 58,
                 child: CgImage(
-                    imageUrl: listing.coverImageUrl,
-                    hue: hue,
-                    cat: SeedData.catById(listing.categoryId)!.icon,
-                    radius: 14),
+                  imageUrl: listing.coverImageUrl,
+                  hue: hue,
+                  cat: SeedData.catById(listing.categoryId)!.icon,
+                  radius: 14,
+                ),
               ),
               const SizedBox(width: 13),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(listing.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTheme.title(16.5)),
+                    Text(
+                      listing.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.title(16.5),
+                    ),
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(Icons.place_outlined,
-                            size: 14, color: AppColors.muted),
+                        const Icon(
+                          Icons.place_outlined,
+                          size: 14,
+                          color: AppColors.muted,
+                        ),
                         const SizedBox(width: 5),
                         Expanded(
-                          child: Text(listing.address,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style:
-                                  AppTheme.body(13, color: AppColors.muted)),
+                          child: Text(
+                            listing.address,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.body(13, color: AppColors.muted),
+                          ),
                         ),
                       ],
                     ),
@@ -181,17 +197,20 @@ class _DirectionsCard extends StatelessWidget {
             child: Row(
               children: [
                 _Stat(
-                    icon: Icons.navigation_outlined,
-                    value: '12 min',
-                    label: 'Driving'),
+                  icon: Icons.navigation_outlined,
+                  value: '12 min',
+                  label: 'Driving',
+                ),
                 _Stat(
-                    icon: Icons.place_outlined,
-                    value: '4.2 km',
-                    label: 'Distance'),
+                  icon: Icons.place_outlined,
+                  value: '4.2 km',
+                  label: 'Distance',
+                ),
                 _Stat(
-                    icon: Icons.schedule,
-                    value: listing.openNow ? 'Open' : 'Closed',
-                    label: 'Status'),
+                  icon: Icons.schedule,
+                  value: listing.openNow ? 'Open' : 'Closed',
+                  label: 'Status',
+                ),
               ],
             ),
           ),
@@ -201,8 +220,11 @@ class _DirectionsCard extends StatelessWidget {
                 child: CgButton(
                   label: 'Google Maps',
                   icon: Icons.navigation_outlined,
-                  onPressed: () => MapLauncherService.openGoogleMaps(lat, lng,
-                      label: listing.name),
+                  onPressed: () => MapLauncherService.openGoogleMaps(
+                    lat,
+                    lng,
+                    label: listing.name,
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -210,8 +232,11 @@ class _DirectionsCard extends StatelessWidget {
                 child: CgButton(
                   label: 'Apple Maps',
                   variant: CgButtonVariant.outline,
-                  onPressed: () => MapLauncherService.openAppleMaps(lat, lng,
-                      label: listing.name),
+                  onPressed: () => MapLauncherService.openAppleMaps(
+                    lat,
+                    lng,
+                    label: listing.name,
+                  ),
                 ),
               ),
             ],
@@ -252,8 +277,11 @@ class _WhiteCircle extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
-  const _WhiteCircle(
-      {required this.icon, required this.color, required this.onTap});
+  const _WhiteCircle({
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -8,7 +8,9 @@ plugins {
 android {
     namespace = "com.example.citi_guide"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Pinned to the highest NDK required by plugins (flutter_map / supabase /
+    // image_picker); NDK releases are backward compatible.
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
