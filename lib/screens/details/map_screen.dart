@@ -44,70 +44,79 @@ class _MapScreenState extends State<MapScreen> {
     final cat = SeedData.catById(_listing.categoryId)!;
     return Scaffold(
       backgroundColor: const Color(0xFFEAF0F2),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: FlutterMap(
-              mapController: _controller,
-              options: MapOptions(
-                initialCenter: _center,
-                initialZoom: 14,
-                backgroundColor: const Color(0xFFE8EEF1),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.citiguide.app',
-                  tileProvider: NetworkTileProvider(),
+      // SizedBox.expand forces the Stack to fill the screen. Without it the
+      // Scaffold gives loose height constraints and the Stack collapses to its
+      // only non-positioned child (the top button row), leaving the map ~90px
+      // tall with a huge blank area below.
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: FlutterMap(
+                mapController: _controller,
+                options: MapOptions(
+                  initialCenter: _center,
+                  initialZoom: 14,
+                  backgroundColor: const Color(0xFFE8EEF1),
                 ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: _center,
-                      width: 44,
-                      height: 44,
-                      child: const MapMarkerPin(size: 44),
-                    ),
-                  ],
-                ),
-                const RichAttributionWidget(attributions: [
-                  TextSourceAttribution('OpenStreetMap contributors'),
-                ]),
-              ],
-            ),
-          ),
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _WhiteCircle(
-                    icon: Icons.arrow_back,
-                    color: AppColors.ink,
-                    onTap: () => Navigator.of(context).pop(),
+                  TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.citiguide.app',
+                    tileProvider: NetworkTileProvider(),
                   ),
-                  _WhiteCircle(
-                    icon: Icons.my_location,
-                    color: AppColors.primary,
-                    onTap: () => _controller.move(_center, 15),
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: _center,
+                        width: 44,
+                        height: 44,
+                        child: const MapMarkerPin(size: 44),
+                      ),
+                    ],
+                  ),
+                  const RichAttributionWidget(
+                    attributions: [
+                      TextSourceAttribution('OpenStreetMap contributors'),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-          Positioned(
-            left: 14,
-            right: 14,
-            bottom: 30,
-            child: _DirectionsCard(
-              listing: _listing,
-              cat: cat.name,
-              city: _city,
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _WhiteCircle(
+                      icon: Icons.arrow_back,
+                      color: AppColors.ink,
+                      onTap: () => Navigator.of(context).pop(),
+                    ),
+                    _WhiteCircle(
+                      icon: Icons.my_location,
+                      color: AppColors.primary,
+                      onTap: () => _controller.move(_center, 15),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+            Positioned(
+              left: 14,
+              right: 14,
+              bottom: 30,
+              child: _DirectionsCard(
+                listing: _listing,
+                cat: cat.name,
+                city: _city,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
